@@ -4,7 +4,7 @@ import numpy as np
 import time
 import pyrebase
 
-app = Flask(__name__)  # creating the Flask class object
+app = Flask(__name__)
 
 config = {
     "apiKey": "AIzaSyDuo1XxvB4Z7id_W7NmC84N5hDui74iv8Q",
@@ -27,7 +27,6 @@ db = firebase_storage.database()
 def home(rid, rdate, rtime):
     cap = cv2.VideoCapture("https://firebasestorage.googleapis.com/v0/b/trafficheatmap-329015.appspot.com/o/Recordings%2F" + str(rid) + "%2F" + rdate + "%2F" + rtime + ".mp4?alt=media&token=c567d077-249e-4a23-a9ba-cf592ed12b3f")
     offset = 6
-    counter = 0
     left_counter = 0
     right_counter = 0
     left_speed_sum = 0
@@ -39,11 +38,7 @@ def home(rid, rdate, rtime):
     algo = cv2.bgsegm.createBackgroundSubtractorMOG()
     coord = [[25, 550], [1200, 550], [0, 650], [1250, 650]]
     dist = 2
-    fps = cap.get(cv2.CAP_PROP_FPS)
 
-    frame_width = int(cap.get(3))
-    frame_height = int(cap.get(4))
-    size = (frame_width, frame_height)
 
     while (cap.isOpened()):
         ret, frame1 = cap.read()
@@ -90,20 +85,18 @@ def home(rid, rdate, rtime):
                         right_tim1 = time.time()
                     detect.remove((x, y))
 
-            if (left_counter != 0):
-                avg_left_speed = left_speed_sum * 3.6 / left_counter
-            if (right_counter != 0):
-                avg_right_speed = right_speed_sum * 3.6 / right_counter
-            #if cv2.waitKey(1) == 13:
-                #break
         except Exception as e:
             break
-    #cv2.destroyAllWindows()
+    if (left_counter != 0):
+        avg_left_speed = (left_speed_sum * 3.6) / left_counter
+    if (right_counter != 0):
+        avg_right_speed = (right_speed_sum * 3.6) / right_counter
     cap.release()
-    # storage.child("Traffic/output.mp4").put(r"https://firebasestorage.googleapis.com/v0/b/trafficheatmap-329015.appspot.com/o/Recordings%2F1%2F1-10-2021%2F12-0.mp4?alt=media&token=8106f3af-afc5-4f7c-b063-6b0030a19230")
+    avg_left_speed = round(avg_left_speed,2)
+    avg_right_speed = round(avg_right_speed,2)
     data = {"left count": left_counter,"right count": right_counter,"left speed": avg_left_speed,"right speed": avg_right_speed}
-    db.child(str(rid)+rdate+rtime).push(data)
-    return str("left count : " + str (left_counter) +"right count : "+str(right_counter)+ "left speed: "+str(avg_left_speed) +"right speed : "+str(avg_right_speed))
+    db.child(str(rid)+"-"+rdate+"-"+rtime).push(data)
+    return str("Left count : " + str (left_counter) +" Right count : "+str(right_counter)+ " Left speed : "+str(avg_left_speed) +" Right speed : "+str(avg_right_speed))
 if __name__ == "__main__":
     app.run()
 
