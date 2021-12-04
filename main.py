@@ -87,6 +87,7 @@ def home(rid, rdate, rtime):
 
         except Exception as e:
             break
+
     if (left_counter != 0):
         avg_left_speed = (left_speed_sum * 3.6) / left_counter
     if (right_counter != 0):
@@ -95,7 +96,7 @@ def home(rid, rdate, rtime):
     avg_left_speed = round(avg_left_speed,2)
     avg_right_speed = round(avg_right_speed,2)
     data = {"left count": left_counter,"right count": right_counter,"left speed": avg_left_speed,"right speed": avg_right_speed}
-    db.child(str(rid)+"-"+rdate+"-"+rtime).push(data)
+    db.child(str(rid)+"-"+rdate+"-"+rtime).set(data)
     return str("Left count : " + str (left_counter) +" Right count : "+str(right_counter)+ " Left speed : "+str(avg_left_speed) +" Right speed : "+str(avg_right_speed))
 if __name__ == "__main__":
     app.run()
