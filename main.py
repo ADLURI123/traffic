@@ -38,6 +38,9 @@ def home(rid, rdate, rtime):
     algo = cv2.bgsegm.createBackgroundSubtractorMOG()
     coord = [[25, 550], [1200, 550], [0, 650], [1250, 650]]
     dist = 2
+    frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    fps = int(cap.get(cv2.CAP_PROP_FPS))
+    seconds = int(frames / fps)
 
 
     while (cap.isOpened()):
@@ -95,9 +98,9 @@ def home(rid, rdate, rtime):
     cap.release()
     avg_left_speed = round(avg_left_speed,2)
     avg_right_speed = round(avg_right_speed,2)
-    data = {"left count": left_counter,"right count": right_counter,"left speed": avg_left_speed,"right speed": avg_right_speed}
+    data = {"left count": left_counter,"right count": right_counter,"left speed": avg_left_speed,"right speed": avg_right_speed,"time" : seconds}
     db.child(str(rid)+"-"+rdate+"-"+rtime).set(data)
-    return str("Left count : " + str (left_counter) +" Right count : "+str(right_counter)+ " Left speed : "+str(avg_left_speed) +" Right speed : "+str(avg_right_speed))
+    return str("Left count : " + str (left_counter) +" Right count : "+str(right_counter)+ " Left speed : "+str(avg_left_speed) +" Right speed : "+str(avg_right_speed)+" time : "+str(seconds))
 if __name__ == "__main__":
     app.run()
 
